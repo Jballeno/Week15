@@ -1,0 +1,97 @@
+package pet.park.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.extern.slf4j.Slf4j;
+import pet.park.controller.model.ContributorData;
+import pet.park.controller.model.PetParkData;
+import pet.park.service.ParkService;
+
+@RestController
+@RequestMapping("/pet_park")
+@Slf4j
+public class ParkController {
+	@Autowired
+	private ParkService parkService;
+	
+	
+	@PostMapping("/contributor")
+	@ResponseStatus(code = HttpStatus.CREATED)
+	public ContributorData insertContributor(
+			@RequestBody ContributorData contributorData) {
+		log.info("creating contributor {}", contributorData);
+		return parkService.saveContributor(contributorData);
+		
+	}
+	
+	@GetMapping("/contributor")
+	public List<ContributorData> retrieveAllContributirs() {
+		log.info(":retreve all contributors called.");
+		return parkService.retrieveAllContributors();
+	}
+	@GetMapping("/contributor/(contributorId")
+	public ContributorData RetrieveContributorById(@PathVariable Long contributorId ) {
+		log.info("retrieveing contributor with ID=()", contributorId);
+		return parkService.retrieveContributorById(contributorId);
+	}
+	@DeleteMapping("/contributor")
+	public void deleteAllContributors() {
+		log.info("Atteempting to delete all contributors");
+		throw new UnsupportedOperationException(
+				"Deleeting all contributors is not allowed");
+	}
+	@DeleteMapping("/contributor/{contributorId}")
+	public Map<String, String> delteVontributorById(@PathVariable Long contributorId) {
+		log.info("Deleteing contributor with ID =()", contributorId);
+		
+		parkService.deleteContributorById(contributorId);
+		
+		return Map.of("message", "Deletion of contrbutor ID=" + contributorId + "was successful.");
+	}
+	@PostMapping("/contributor/{contributorId}/park")
+	@ResponseStatus(code = HttpStatus.CREATED)
+	public PetParkData insertPetPark(@PathVariable Long contributorId, @RequestBody PetParkData petParkData) {
+		log.info("Creating park {} for contributor with ID={}", petParkData,  contributorId);
+		
+		return parkService.savePetPark(contributorId, petParkData);
+		
+	}
+
+
+@PutMapping("/contributor/(contributorId)/park/{parkId}")
+public PetParkData updatePetPark(@PathVariable Long contributorId, 
+		@PathVariable Long parkId,
+		@RequestBody PetParkData petParkData) {
+	
+		petParkData.setPetParkId(parkId);
+		
+	log.info("Creating park {} for contributor with ID={}", petParkData,  contributorId);
+	
+	
+	return parkService.savePetPark(contributorId, petParkData);
+	
+}
+
+	@GetMapping("/contributor/{contributorId}/parkId/{parkId}")
+	public PetParkData retrievePetParkById(@PathVariable Long contributorId,
+			@PathVariable Long parkId) {
+		log.info("Retrieving pet park with ID={} for contributor with ID={}", parkId, contributorId);
+		
+		return parkService.retrievePetParkById(contributorId, parkId);
+		
+		
+	}
+}
